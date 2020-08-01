@@ -1,1 +1,46 @@
 ---
+- name: Install server maven
+  hosts: maven
+  become: yes
+
+  tasks:
+  - name: Ensure maven is present
+    apt:
+      name: maven
+      state: present
+
+  - name: Ensure git is present
+    apt:
+      name: git
+      state: present
+
+  - name: Clone repository
+    git:
+      repo: https://github.com/boxfuse/boxfuse-sample-java-war-hello.git
+      dest: /home/boxfuse
+
+  - name: Build
+    shell: mvn package
+    args:
+      chdir: /home/boxfuse/boxfuse-sample-java-war-hello
+            
+- name: Install server tomcat
+  hosts: tomcat
+  become: yes
+
+  tasks:
+  - name: Ensure tomcat is present
+    apt:
+      name: tomcat8
+      state: present
+
+  - name: Copy .war-file
+    synchronize:
+      src: /home/boxfuse/boxfuse-sample-java-war-hello/target/*.war
+      dest: /var/lib/tomcat8/webapps/
+    delegate_to: maven
+
+  - name: Ensure tomcat service is started
+    service:
+      name: tomcat
+      state: started  
