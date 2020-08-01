@@ -14,6 +14,9 @@
       name: git
       state: present
 
+  - name: install java and export JAVA_HOME
+    shell: apt install -y default-jdk maven git && export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64 && export PATH=$PATH:$JAVA_HOME/bin &&
+  
   - name: Clone repository
     git:
       repo: https://github.com/boxfuse/boxfuse-sample-java-war-hello.git
